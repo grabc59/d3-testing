@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="shortcut icon" type="image/png" href="bobafett.png"/>
+  <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css"
+          rel="stylesheet">
+</head>
+<body>
+
+  <style>
+    .node1 {
+        /*fill: #0000cc;*/
+        stroke: black;
+        /*stroke-width: 2px;*/
+    }
+    .node1 text {
+      pointer-events: none;
+      font: 10px sans-serif;
+    }
+    .link1 {
+        stroke: #0000aa;
+        stroke-width: 1px;
+    }
+
+  </style>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script>
+      var width = 640, height = 480;
+      var animationStep = 400;
+      var force1 = null, nodes1 = null, links1 = null;
+      var svg = d3.select('body').append('svg')
+          .attr('width', width)
+          .attr('height', height);
+
+      ////////////////////////////////
+      //////  FORCE
+      ////////////////////////////////
+      var initForce = function() {
+        ////////////////////////////////
+        ////// NODES
+        ////////////////////////////////
+          var nodeData1 = [
+            {name: "router4", chassisId:  "0023.7dfb.xxxx", portId: "0023.7dfb.xxxx", portDescription: "eth2", lclPort: "1/1/3"},
+            {name: "router4", chassisId:  "0000.5a73.xxxx", portId: "0023.7dfb.xxxx", portDescription: "eth2", lclPort: "1/1/3"},
+            {name: "router3", chassisId:  "0023.5dfb.xxxx", portId: "0023.7dfb.xxxx", portDescription: "eth2", lclPort: "1/1/3"},
+            {name: "router2", chassisId:  "0023.4dfb.xxxx", portId: "0023.7dfb.xxxx", portDescription: "eth2", lclPort: "1/1/3"}
+         ];
+          ////////////////////////////////
+          ////// LINKS
+          ////////////////////////////////
+         var linkData1 = [
+           {source:0, target: 1},
+           {source:1, target: 2},
+           {source:2, target: 3},
+           {source:3, target: 1}
+         ];
+
+         ////////////////////////////////
+         ////// FORCE SETUP
+         ////////////////////////////////
+        force1 = d3.layout.force()
+           .size([width, height])
+           .nodes(nodeData1)
+           .links(linkData1);
+
+        /////// SET LINK DISTANCE
+        force1.linkDistance(height/2);
+
+        /////// SET LINK COORDINATES
+        links1 = svg.selectAll('.link1')
+          .data(linkData1)
+          .enter().append('line')
+          .attr('class', 'link1')
+          .attr('x1', function(d) { return nodeData1[d.source].x; })
+          .attr('y1', function(d) { return nodeData1[d.source].y; })
+          .attr('x2', function(d) { return nodeData1[d.target].x; })
+          .attr('y2', function(d) { return nodeData1[d.target].y; });
+
+        /////// SET NODE COORDINATES (overlapping the links)
+        nodes1 = svg.selectAll('.node1')
+          .data(nodeData1)
+          .enter().append("g")
+            .attr("class", "node1");
+
+        nodes1.append("image")
+            .attr("xlink:href", "bobafett.png")
+            .attr("x", -8)
+            .attr("y", -8)
+            .attr("width", 16)
+            .attr("height", 16);
+
+        nodes1.append("text")
+          .attr("dx", 12)
+          .attr("dy", ".35em")
+          .text(function(d) { return d.name })
+      }
+
+
+      ////////////////////////////////
+      ////// CALL INITFORCE
+      ////////////////////////////////
+      initForce();
+
+
+      /////// FORCE IS DONE LISTENER
+      force1.on('end', function() {
+          nodes1.attr('r', width/25)
+          .attr('cx', function(d) { return d.x; })
+          .attr('cy', function(d) { return d.y; });
+
+          links1.attr('x1', function(d) { return d.source.x; })
+          .attr('y1', function(d) { return d.source.y; })
+          .attr('x2', function(d) { return d.target.x; })
+          .attr('y2', function(d) { return d.target.y; });
+
+      });
+
+
+      /////// FORCE TICK LISTENER
+      // necessary to show the diagram as soon as it starts loading
+      force1.on("tick", function() {
+        links1.attr("x1", function(d) { return d.source.x; })
+            .attr("y1", function(d) { return d.source.y; })
+            .attr("x2", function(d) { return d.target.x; })
+            .attr("y2", function(d) { return d.target.y; });
+
+        nodes1.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+      });
+
+
+      ////////////////////////////////
+      ////// CALL FORCE START
+      ////////////////////////////////
+      force1.start();
+
+  </script>
+</body>
+</html>
