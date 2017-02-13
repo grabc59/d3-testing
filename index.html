@@ -41,21 +41,48 @@
         ////////////////////////////////
         ////// NODES
         ////////////////////////////////
-        //   var nodeData1 = [
-        //     {name: "router1", chassisId:  "0023.7dfb.xxxx", portId: "0023.7dfb.xxxx", portDescription: "eth2", lclPort: "1/1/3"},
-        //     {name: "router2", chassisId:  "0000.5a73.xxxx", portId: "0023.7dfb.xxxx", portDescription: "eth2", lclPort: "1/1/3"},
-        //     {name: "router3", chassisId:  "0023.5dfb.xxxx", portId: "0023.7dfb.xxxx", portDescription: "eth2", lclPort: "1/1/3"},
-        //     {name: "router4", chassisId:  "0023.4dfb.xxxx", portId: "0023.7dfb.xxxx", portDescription: "eth2", lclPort: "1/1/3"}
-        //  ];
+        // DATA
+        var data = [
+          {
+            deviceName: "router1",
+            chassisId: "0023.7dfb.xxxx",
+            capabilities: "R",
+            connections: [
+              {
+                source: "router1",
+                sourcePort: "Gi0/1",
+                target: "router2",
+                targetPort: "Gi0/2",
+              }
+            ],
+          },
+          {
+            deviceName: "router2",
+            chassisId: "0023.7dfb.xxxx",
+            capabilities: "R",
+            connections: [
+              {
+                source: "router2",
+                sourcePort: "Gi0/1",
+                target: "router1",
+                targetPort: "Gi0/2",
+              }
+            ],
+          },
+        ];
         var nodeData1 = {}
-
 
           ////////////////////////////////
           ////// LINKS
           ////////////////////////////////
-         var linkData1 = [
-           {source:"router1", target: "router2"}
-         ];
+         var linkData1 = [];
+
+         data.forEach(function(device) {
+           device.connections.forEach(function(connection) {
+            linkData1.push(connection);
+          })
+         });
+
          linkData1.forEach(function(link) {
            link.source = nodeData1[link.source] || (nodeData1[link.source] = {name: link.source});
            link.target = nodeData1[link.target] || (nodeData1[link.target] = {name: link.target});
